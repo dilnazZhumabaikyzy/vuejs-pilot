@@ -1,25 +1,41 @@
 <template>
-    Pabotaet!
-    <button v-on:click="addLike">Like</button>
-    <button @click="addDislike">Dislike</button>
-    <div>Likes: <strong>{{ likes }} </strong></div>
-    <div>Dislikes: <strong>{{ dislikes }}</strong></div>
+    <div class="app">
+        <post-form @create = "createPost"/>
+        <post-list v-bind:posts="posts"/>
+    </div>
 </template>
 <script>
+import PostForm from './components/PostForm';
+import PostList from './components/PostList';
 export default{
+      components:{
+        PostForm, PostList
+      },
     data(){
         return{
-            likes: 0,
-            dislikes: 5
+            posts: [ 
+            { id: '1', title: 'js', body: 'Description 1'},
+            { id: '2', title: 'java', body: 'Description 3'},
+            { id: '3', title: 'php', body: 'Description 4'},
+            { id: '4', title: 'go', body: 'Description 5'},
+        ]
         }
     },
     methods: {
-        addLike(){
-            this.likes += 1;
-        },
-        addDislike(){
-            this.dislikes += 1;
-        },
+        createPost(post){
+          // console.log(post)
+          this.posts.push(post)
+        }
+          
     }
 }
 </script>
+<style>
+     *{
+        margin: 0;
+      }
+      .app{
+        margin: 10px;
+      }
+
+</style>
