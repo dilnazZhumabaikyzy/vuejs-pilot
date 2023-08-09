@@ -12,6 +12,15 @@
         </my-dialogue>
         <post-list v-if="!isPostsLoading" :posts="sortedAndSearchedPost" @remove = "onDeletePost"/>
         <div v-else><h3>Loading...</h3></div>
+        <div class="page-wrapper">
+          <div class="pageNumber"
+           v-for="pageNumber in totalPages"
+           :class="{
+            'current-page': page === pageNumber
+           }"
+           @click="changePage(pageNumber)"
+           > {{ pageNumber }}  </div>
+        </div>
     </div>
 </template>
 <script>
@@ -28,6 +37,9 @@ export default{
             posts: [],
             dialogueVisible: false,
             isPostsLoading: false,
+            page: 1,
+            limit: 10,
+            totalPages: 0,
             selectedSort: '',
             searchQuery: '',
             sortOptions: [
@@ -47,18 +59,27 @@ export default{
         showDialogue(){
           this.dialogueVisible = true
         },
+        changePage(pageNumber){
+          this.page = pageNumber
+    
+        },
         async fetchPosts(){
           try {
             this.isPostsLoading = true
-            setTimeout(async () => {
-              const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
+            
+              const response = await axios.get('https://jsonplaceholder.typicode.com/posts',
+               {params: {
+                  _page: this.page,
+                  _limit:this.limit
+              }})
+              this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
               this.posts = response.data
-              this.isPostsLoading = false
-            }, 1000)
-            // const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10')
-            // this.posts = response.data
+            
+            
           } catch (error) {
             alert('ERROR!')
+          } finally{
+            this.isPostsLoading = false
           }
         }          
     },
@@ -71,6 +92,11 @@ export default{
       },
       sortedAndSearchedPost(){
         return this.sortedPost.filter(post=>post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
+      }
+    },
+    watch:{
+      page(){
+          this.fetchPosts()
       }
     }
 }
@@ -87,6 +113,23 @@ export default{
         display: flex;
         justify-content: space-between;
         margin: 10px 0;
+      }
+      .page-wrapper{
+        justify-content: center;
+        display: flex;
+        margin: 5px;
+
+      }
+      .pageNumber{
+        border: 1px solid teal;
+        padding: 3px;
+        margin: 2px;
+        color: teal;
+        font-weight: bold;
+      }
+      .current-page{
+        background-color: teal;
+        color: white;
       }
 
 </style>
