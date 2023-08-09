@@ -1,13 +1,13 @@
 <template>
     <form @submit.prevent>
             <h4>Form</h4>
-            <input v-model="post.title" class="input"  type="text" >
-            <input  class="input" type="text" v-model="post.body">
-            <button class="button" @click="createPost">Go</button>
+            <my-input v-model="post.title"/>
+            <my-input v-model="post.body"/>
+            <my-button @click="createPost" style=" margin-top: 15px;">Go</my-button>
     </form>
 </template>
 <script>
-export default{
+export default{  
     data(){
         return{
             post: {
@@ -34,13 +34,5 @@ export default{
         display: flex;
         flex-direction: column;
       }
-      .input{
-        border: 1px solid teal;
-        margin: 5px;
-        padding: 10px 15px;
-      }
-      .button {
-        margin: 5px;
-        padding: 5px;
-      }
+    
 </style>
