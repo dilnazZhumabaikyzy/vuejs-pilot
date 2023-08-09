@@ -5,11 +5,11 @@
           <my-button @click="showDialogue">Create Post</my-button>
           <my-select v-model="selectedSort" :options = "sortOptions"/>
         </div>
-        <my-button @click = "fetchPosts">Get Posts</my-button>
+       
         <my-dialogue v-model:show = "dialogueVisible">
           <post-form @create = "createPost"/>
         </my-dialogue>
-        <post-list v-if="!isPostsLoading" v-bind:posts="posts" @remove = "onDeletePost"/>
+        <post-list v-if="!isPostsLoading" :posts="sortedPost" @remove = "onDeletePost"/>
         <div v-else><h3>Loading...</h3></div>
     </div>
 </template>
@@ -63,11 +63,9 @@ export default{
     mounted(){
       this.fetchPosts()
     },
-    watch:{
-      selectedSort(newValue){
-        this.posts.sort((a,b)=>{
-          return a[newValue]?.localeCompare(b[newValue])
-        })
+    computed:{
+      sortedPost(){
+        return [...this.posts].sort((a,b)=> a[this.selectedSort]?.localeCompare(b[this.selectedSort]))
       }
     }
 }
