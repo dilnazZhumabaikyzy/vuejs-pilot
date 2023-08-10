@@ -12,7 +12,8 @@
         </my-dialogue>
         <post-list v-if="!isPostsLoading" :posts="sortedAndSearchedPost" @remove = "onDeletePost"/>
         <div v-else><h3>Loading...</h3></div>
-        <div class="page-wrapper">
+        <div ref="observer" class="observer"></div>
+        <!-- <div class="page-wrapper">
           <div class="pageNumber"
            v-for="pageNumber in totalPages"
            :class="{
@@ -20,7 +21,7 @@
            }"
            @click="changePage(pageNumber)"
            > {{ pageNumber }}  </div>
-        </div>
+        </div> -->
     </div>
 </template>
 <script>
@@ -59,32 +60,46 @@ export default{
         showDialogue(){
           this.dialogueVisible = true
         },
-        changePage(pageNumber){
-          this.page = pageNumber
+        // changePage(pageNumber){
+        //   this.page = pageNumber
     
-        },
-        async fetchPosts(){
+        // },
+        async loadMorePosts(){
           try {
-            this.isPostsLoading = true
-            
+            this.page +=1
+           
               const response = await axios.get('https://jsonplaceholder.typicode.com/posts',
                {params: {
                   _page: this.page,
                   _limit:this.limit
               }})
               this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
-              this.posts = response.data
+              this.posts = [...this.posts,...response.data]
             
             
           } catch (error) {
             alert('ERROR!')
-          } finally{
-            this.isPostsLoading = false
-          }
+          } 
         }          
     },
     mounted(){
-      this.fetchPosts()
+      this.loadMorePosts()
+      
+   
+      const options = {
+        rootMargin: "0px",
+        threshold: 1.0,
+      };
+
+      const callback = (entries, observer)=>{
+        if(entries[0].isIntersecting && this.page < this.totalPages){
+          this.loadMorePosts()
+        }
+      }
+      const observer =  new IntersectionObserver(callback, options);
+      observer.observe(this.$refs.observer)
+  
+
     },
     computed:{
       sortedPost(){
@@ -95,9 +110,9 @@ export default{
       }
     },
     watch:{
-      page(){
-          this.fetchPosts()
-      }
+      // page(){
+      //     this.fetchPosts()
+      // }
     }
 }
 </script>
@@ -130,6 +145,10 @@ export default{
       .current-page{
         background-color: teal;
         color: white;
+      }
+      .observer{
+        height: 30px;
+        background: gray;
       }
 
 </style>
